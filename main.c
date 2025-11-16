@@ -7,6 +7,7 @@
 #include<time.h>
 #include<wchar.h>
 #include<stdlib.h>
+#include<math.h>
 
 // global variables
 int size = 1000;
@@ -18,11 +19,12 @@ int mode;
 int max;
 
 //prototypes
-int *randomNumbers();
-// void printNumbers(int* numbers);
-void writeToFile(int *numbers);
 
+//helper functions
+int *randomNumbers();
+void writeToFile(int *numbers);
 void calcTotalSum();
+void sortNumbers();
 
 //MEAN function
 void *calcMean(void *arg);
@@ -48,20 +50,57 @@ int main(){
 
     //Giving threads tasks
     pthread_create(&thread1,NULL,calcMean,NULL);
-    //waits for the thread to finish
+    //wait for mean to finish
     pthread_join(thread1, NULL);
 
+    pthread_create(&thread2,NULL,calcStandardDeviation,NULL);
+    //waits for the standardDeviation to finish
+    pthread_join(thread2, NULL);
+   
+
     printf("Mean: %.2lf\n",mean);
+    printf("Standard Deviation: %.2lf\n",standardDeviation);
 
 
     printf("\n\n");
     return 0;
 }
 
+void *calcStandardDeviation(void *arg){
+
+    FILE *fptr = fopen("numbers.txt","r");
+    double num;
+    double variance = 0;
+    double deviationSum = 0;
+
+    if(fptr == NULL){
+        printf("Error reading file!");
+        exit(0);
+    } 
+
+    while (fscanf(fptr, "%lf", &num) == 1) {
+        deviationSum += pow(num - mean,2);
+    }
+    variance = deviationSum / size;
+
+    standardDeviation = sqrt(variance);
+
+    fclose(fptr);
+    pthread_exit(NULL);
+}
+
+
+void sortNumbers(){
+    FILE *fptr = fopen("numbers.txt","w");
+    
+
+}
+
+
 
 //calculate the mean
 void* calcMean(void* arg){
-    mean =  ((double) sum) / size;
+    mean =  (double) sum / size;
     pthread_exit(NULL);
 
 }
@@ -78,6 +117,7 @@ void calcTotalSum(){
 
     while (fscanf(fptr, "%d", &num) == 1) {
         sum += num;
+        
     }
 
     fclose(fptr);
