@@ -24,12 +24,14 @@ int max;
 int *randomNumbers();
 void writeToFile(int *numbers);
 void calcTotalSum();
-void sortNumbers();
 
 //MEAN function
 void *calcMean(void *arg);
-//Standard Deviation
+//STANDARD DEVIATION function
 void *calcStandardDeviation(void *arg);
+//MEDIAN function
+void *calcMedian(void *arg);
+
 
 
 int main(){
@@ -50,11 +52,12 @@ int main(){
 
     //Giving threads tasks
     pthread_create(&thread1,NULL,calcMean,NULL);
-    //wait for mean to finish
+    //ensuring this thread finished first to prevent race conditions with thread2(it depends on mean)
     pthread_join(thread1, NULL);
 
+
     pthread_create(&thread2,NULL,calcStandardDeviation,NULL);
-    //waits for the standardDeviation to finish
+    //waits for the threads to finish
     pthread_join(thread2, NULL);
    
 
@@ -65,6 +68,17 @@ int main(){
     printf("\n\n");
     return 0;
 }
+
+
+//LEFT OFF HERE:
+//Read and store values in array
+//sort them.
+//Then find the middle element
+
+
+// void* calcMedian(void *arg){
+
+// }
 
 void *calcStandardDeviation(void *arg){
 
@@ -88,14 +102,6 @@ void *calcStandardDeviation(void *arg){
     fclose(fptr);
     pthread_exit(NULL);
 }
-
-
-void sortNumbers(){
-    FILE *fptr = fopen("numbers.txt","w");
-    
-
-}
-
 
 
 //calculate the mean
