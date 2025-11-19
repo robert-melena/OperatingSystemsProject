@@ -9,8 +9,7 @@
 #include <math.h>
 const int size = 5000000;  
 int numbers[size];
-
-int sum = 0;
+unsigned long long sum = 0;
 double mean;
 double standardDeviation;
 double median;
@@ -20,6 +19,7 @@ int max;
 // FUNCTION PROTOTYPES
 void randomNumbers();
 void writeToFile();
+void loadFromFile();
 void calcTotalSum();
 int compare(const void *a, const void *b);
 
@@ -36,13 +36,14 @@ void* calcMax(void *arg);
 // ===========================
 int main() {
 
-    printf("\nGenerating random numbers...\n");
-    randomNumbers();
+    // randomNumbers();
+    // writeToFile();
 
+    printf("\n Loading numbers from file...\n");
+    loadFromFile();
     printf("Sorting numbers...\n");
     qsort(numbers, size, sizeof(int), compare);
 
-    writeToFile();
     calcTotalSum();
 
     pthread_t t1, t2, t3, t4, t5;
@@ -86,13 +87,13 @@ void* calcMean(void *arg) {
 
 // added some heavy workload 
 void* calcStandardDeviation(void *arg) {
-    double variance = 0;
+    long double variance = 0.0L;
 
     for (int i = 0; i < size; i++) {
         double diff = numbers[i] - mean;
 
         for (int j = 0; j < 50; j++) {
-            variance += pow(diff,2);
+            variance += (long double)diff * (long double)diff;
         }
     }
 
@@ -159,4 +160,13 @@ int compare(const void *a, const void *b) {
     if (first> second) return  1;
     if (first < second) return -1;
     return 0;
+}
+
+//load from file
+void loadFromFile() {
+    FILE *f = fopen("numbers.txt", "r");
+    for (int i = 0; i < size; i++) {
+        fscanf(f, "%d", &numbers[i]);
+    }
+    fclose(f);
 }

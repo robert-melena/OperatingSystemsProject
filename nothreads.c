@@ -12,7 +12,7 @@
 // global variables
 const int size = 5000000;
 int numbers[size];  // global array available to all threads
-int sum;
+unsigned long long sum;
 double mean; //done
 double standardDeviation; //done
 double median; //done
@@ -24,6 +24,7 @@ int max; //done
 //helper functions
 void randomNumbers();
 void writeToFile();
+void loadFromFile();
 void calcTotalSum();
 int compare(const void *element1, const void *element2);
 
@@ -48,11 +49,18 @@ void calcMax();
 int main(){
     printf("\n\n");
     //generate random numbers
-    randomNumbers();
+    // randomNumbers();
     //sorting the numbers here
-    qsort(numbers,size,sizeof(int),compare);
     //write numbers to file
-    writeToFile();
+    // writeToFile();
+
+
+
+    printf("\n Loading numbers from file...\n");
+    loadFromFile();
+    printf("Sorting numbers...\n");
+    qsort(numbers, size, sizeof(int), compare);
+
     //Calculate total sum
     calcTotalSum();
 
@@ -111,13 +119,13 @@ void calcMedian(){
 
 //calculate standard deviation
 void calcStandardDeviation(){
-double variance = 0;
+    long double variance = 0.0L;
 
     for (int i = 0; i < size; i++) {
         double diff = numbers[i] - mean;
 
         for (int j = 0; j < 50; j++) {
-            variance += pow(diff,2);
+            variance += (long double)diff * (long double)diff;
         }
     }
 
@@ -160,10 +168,20 @@ void writeToFile(){
         printf("Data written to file and is now closed\n");
 }
 
+
 //generate the random numbers
 void randomNumbers() {
     srand(time(0));
     for (int i = 0; i < size; i++) {
         numbers[i] = (rand() % 100) + 1;
     }
+}
+
+//load from file
+void loadFromFile() {
+    FILE *f = fopen("numbers.txt", "r");
+    for (int i = 0; i < size; i++) {
+        fscanf(f, "%d", &numbers[i]);
+    }
+    fclose(f);
 }
